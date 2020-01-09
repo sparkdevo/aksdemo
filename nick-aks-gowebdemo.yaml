@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nick-demo-back
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nick-demo-back
+  template:
+    metadata:
+      labels:
+        app: nick-demo-back
+    spec:
+      containers:
+      - name: nick-demo-back
+        image: sparkdev/gowebdemo
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 250m
+            memory: 256Mi
+        ports:
+        - containerPort: 8088
+          name: gowebdemo
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nick-demo-back
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 8088
+  selector:
+    app: nick-demo-back
