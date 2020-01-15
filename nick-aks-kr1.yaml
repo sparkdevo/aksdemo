@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nickdemo2
+  labels:
+    app: nickdemo2
+spec:
+  ports:
+    - port: 80
+  selector:
+    app: nicknginx2
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nicknginx2
+spec:
+  selector:
+    matchLabels:
+      app: nicknginx2
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: nicknginx2
+    spec:
+      containers:
+      - name: nicknginx2
+        image: nginx:1.13.12
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 250m
+            memory: 256Mi
+        ports:
+        - containerPort: 80
+          name: nicknginx2
+        volumeMounts:
+        - mountPath: "/etc/nginx/nginx.conf"
+          subPath: nginx.conf
+          name: config
+        - mountPath: "/etc/nginx/conf.d/"
+          name: config1
+        - mountPath: "/etc/nginx/conf.crt/"
+          name: config2
+      volumes:
+        - name: config
+          configMap:
+            name: test-config
+            items:
+            - key: nginx.conf
+              path: nginx.conf
+        - name: config1
+          configMap:
+            name: test1-config
+        - name: config2
+          configMap:
+            name: test2-config
